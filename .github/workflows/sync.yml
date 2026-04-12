@@ -1,0 +1,51 @@
+# GitHub Actions workflow to sync predictions to public repo
+# Edit the variables below before enabling
+
+name: Sync Predictions
+
+# Run manually from Actions tab
+on:
+  workflow_dispatch:
+    inputs:
+      public_repo:
+        description: 'hunter1712.github.io'
+        required: true
+        default: 'hunter1712/tennis-predictor'
+      commit_message:
+        description: 'Commit message'
+        required: false
+        default: 'Update predictions from automated run'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+        shell: bash
+
+      - name: Run training pipeline
+        run: python src/main.py
+
+      - name: Export predictions
+        run: python src/export_predictions.py
+
+      - name: Push predictions.js to public repo
+        uses: cpina/github-action-push-to-another-repository@main
+        with:
+          source-directory: 'output'
+          destination-github-username: ${{ github.event.inputs.public_repo }}
+          destination-repository-name: ''
+          destination-branch: main
+          user-email: 'action@github.com'
+          user-name: 'GitHub Action'
+          commit-message: ${{ github.event.inputs.commit_message }}
