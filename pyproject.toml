@@ -1,0 +1,27 @@
+[project]
+name = "tennis-prediction"
+version = "0.1.0"
+description = "XGBoost model predicting ATP tennis match winners"
+requires-python = ">=3.14"
+dependencies = [
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.4",
+    "pandas>=3.0.2",
+    "scikit-learn==1.8.0",
+    "xgboost>=2.0.0",
+    "optuna>=4.0.0",
+    "pytest>=8.0.0",
+    "joblib>=1.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
