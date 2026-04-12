@@ -27,7 +27,7 @@ from model import (
     predict_match,
 )
 
-CACHE_PATH = "../data_cache.pkl"
+CACHE_PATH = "data_cache.pkl"
 
 
 class TennisPredictionPipeline:
@@ -38,8 +38,10 @@ class TennisPredictionPipeline:
         self.results: Optional[dict] = None
         self.feature_cols = FEATURE_COLS
 
-    def run(self) -> tuple[XGBClassifier, dict]:
+    def run(self, test_mode: bool = False) -> tuple[XGBClassifier, dict]:
         """Execute full training pipeline."""
+        is_test = test_mode or config.TRAIN_WITH_TEST
+
         logger.info("=" * 60)
         logger.info("TENNIS MATCH WINNER PREDICTION MODEL")
         logger.info("=" * 60)
@@ -65,26 +67,45 @@ class TennisPredictionPipeline:
         logger.info("5. PREPARING MODEL DATA")
         X, y, self.feature_cols = prepare_model_data(df_features)
 
-        logger.info("6. SPLITTING DATA")
-        X_train, X_test, y_train, y_test = chronological_split(
-            df_features, self.feature_cols
-        )
+        if is_test:
+            # Test mode: split data chronologically
+            logger.info("6. SPLITTING DATA (TEST MODE)")
+            X_train, X_test, y_train, y_test = chronological_split(
+                df_features, self.feature_cols
+            )
 
-        logger.info("7. TRAINING MODEL")
-        self.model = train_model(X_train, y_train)
+            logger.info("7. TRAINING MODEL")
+            self.model = train_model(X_train, y_train)
 
-        logger.info("8. EVALUATING MODEL")
-        self.results = evaluate_model(
-            self.model, X_train, X_test, y_train, y_test, self.feature_cols
-        )
+            logger.info("8. EVALUATING MODEL")
+            self.results = evaluate_model(
+                self.model, X_train, X_test, y_train, y_test, self.feature_cols
+            )
 
-        logger.info("9. SAVING MODEL")
-        save_model(self.model)
+            logger.info("9. SAVING MODEL")
+            save_model(self.model)
 
-        logger.info("SUMMARY")
-        logger.info(f"  Test Accuracy: {self.results['test_accuracy']:.2%}")
-        logger.info(f"  Test ROC-AUC:  {self.results['test_roc_auc']:.4f}")
-        logger.info(f"  Model saved to: {config.MODEL_PATH}")
+            logger.info("SUMMARY")
+            logger.info(f"  Test Accuracy: {self.results['test_accuracy']:.2%}")
+            logger.info(f"  Test ROC-AUC:  {self.results['test_roc_auc']:.4f}")
+            logger.info(f"  Model saved to: {config.MODEL_PATH}")
+
+            self.results["train_samples"] = len(X_train)
+            self.results["test_samples"] = len(X_test)
+        else:
+            # Production mode: train on ALL data
+            logger.info("6. TRAINING ON ALL DATA (PRODUCTION)")
+            self.model = train_model(X, y)
+
+            logger.info("7. SAVING MODEL")
+            save_model(self.model)
+
+            logger.info(f"Model trained on {len(X):,} samples")
+            logger.info(f"Model saved to: {config.MODEL_PATH}")
+
+            self.results = {"train_samples": len(X)}
+
+        return self.model, self.results
 
         return self.model, self.results
 
@@ -100,10 +121,10 @@ class TennisPredictionPipeline:
         return predict_match(self.model, match_features, self.feature_cols)
 
 
-def run_pipeline() -> tuple[XGBClassifier, dict]:
+def run_pipeline(test_mode: bool = False) -> tuple[XGBClassifier, dict]:
     """Convenience function to run the pipeline."""
     pipeline = TennisPredictionPipeline()
-    return pipeline.run()
+    return pipeline.run(test_mode=test_mode)
 
 
 def load_existing_model() -> XGBClassifier:

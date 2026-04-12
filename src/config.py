@@ -11,11 +11,15 @@ from dataclasses import dataclass
 class Config:
     """Main configuration for the tennis prediction model"""
 
-    DATA_FOLDER: str = "../data"
-    MODEL_PATH: str = "../models/tennis_model.pkl"
+    DATA_FOLDER: str = "data"
+    MODEL_PATH: str = "models/tennis_model.pkl"
+
+    # Production: train on all data (1991-2026)
+    # Use --test flag to enable test mode (train on 1991-2024, test on 2025-2026)
+    TRAIN_WITH_TEST: bool = False  # Set via command line arg
 
     TRAIN_START_YEAR: int = 1991
-    TRAIN_END_YEAR: int = 2024
+    TRAIN_END_YEAR: int = 2026  # All data by default
     TEST_START_YEAR: int = 2025
     TEST_END_YEAR: int = 2026
 

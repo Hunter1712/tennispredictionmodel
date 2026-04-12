@@ -211,8 +211,8 @@ def main():
             "accuracy": float(accuracy),
             "features": len(FEATURE_COLS),
             "feature_list": FEATURE_COLS,
-            "trained_years": "1991-2024",
-            "test_years": "2025-2026",
+            "trained_years": "1991-2026",
+            "test_years": "2025-2026" if accuracy else "N/A",
             "predictions_count": len(predictions),
             "players": len(players),
         },
@@ -221,13 +221,11 @@ def main():
     }
 
     # Save to output folder (for public repo)
-    os.makedirs("../output", exist_ok=True)
-    with open("../output/predictions.js", "w") as f:
+    os.makedirs("output", exist_ok=True)
+    with open("output/predictions.js", "w") as f:
         f.write("const PREDICTIONS = " + json.dumps(output) + ";")
 
-    print(
-        f"\n✓ Done! {len(predictions):,} predictions saved to ../output/predictions.js"
-    )
+    print(f"\n✓ Done! {len(predictions):,} predictions saved to output/predictions.js")
 
 
 if __name__ == "__main__":
