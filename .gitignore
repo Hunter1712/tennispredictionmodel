@@ -4,45 +4,43 @@ __pycache__/
 *.pyc
 *.so
 .Python
-.venv/
-venv/
-ENV/
 *.egg-info/
 dist/
 build/
 
-# Data files (CSV)
-data/*.csv
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Data files (raw CSV - download separately)
+data/
 
 # Model outputs
+models/
 *.pkl
 *.joblib
-*.h5
-*.pb
-models/
 
 # Cache files
 *.cache
 data_cache.pkl
-cache/
 __pypackages__/
 
 # IDE
 .idea/
 .vscode/
-.ruff_cache/
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Web UI output (keep in separate public repo)
+# Web UI output
+output/
 predictions.js
 predictions.min.js
-output/
 
 # Logs
 *.log
 
-# PyCharm specific
-.idea/
+# Git
+.git/

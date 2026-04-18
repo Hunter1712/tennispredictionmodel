@@ -25,7 +25,8 @@ class Config:
     MODEL_PARAMS: dict = None
 
     def __post_init__(self):
-        self.MODEL_PARAMS = {            "n_estimators": 272,
+        self.MODEL_PARAMS = {
+            "n_estimators": 272,
             "max_depth": 9,
             "learning_rate": 0.05420686096244507,
             "min_child_weight": 5,
@@ -40,6 +41,7 @@ class Config:
             "n_jobs": -1,
             "verbosity": 0,
             "tree_method": "hist",
+        }
 
 
 config = Config()
