@@ -21,8 +21,8 @@ from sklearn.metrics import (
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from joblib import dump, load
 
-from config import config, logger
-from exceptions import (
+from .config import config, logger
+from .exceptions import (
     ModelTrainingError,
     ModelEvaluationError,
     ModelSaveError,

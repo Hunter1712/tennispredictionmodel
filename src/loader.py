@@ -7,8 +7,8 @@ from glob import glob
 
 import pandas as pd
 
-from config import config, logger
-from exceptions import DataLoadError
+from .config import config, logger
+from .exceptions import DataLoadError
 
 
 def load_all_csv() -> pd.DataFrame:

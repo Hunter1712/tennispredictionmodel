@@ -4,23 +4,22 @@ Pipeline orchestration for Tennis Match Prediction Model.
 
 from __future__ import annotations
 
-import os
 import pickle
 from typing import TYPE_CHECKING
 
 import pandas as pd
 from xgboost import XGBClassifier
 
-from config import config, logger
-from loader import load_all_csv
-from cleaner import clean_data
-from features import (
+from .config import config, logger
+from .loader import load_all_csv
+from .cleaner import clean_data
+from .features import (
     build_player_stats,
     engineer_features,
     prepare_model_data,
     FEATURE_COLS,
 )
-from model import (
+from .model import (
     chronological_split,
     train_model,
     evaluate_model,
@@ -32,9 +31,7 @@ from model import (
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-import os
-
-CACHE_PATH = os.path.join(os.path.dirname(__file__), "..", "data_cache.pkl")
+CACHE_PATH = "../data_cache.pkl"
 
 
 class TennisPredictionPipeline:

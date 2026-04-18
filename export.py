@@ -9,10 +9,10 @@ import os
 import numpy as np
 import pandas as pd
 
-from config import config
-from model import load_model
-from features import FEATURE_COLS
-from pipeline import load_cached_data
+from src.config import config
+from src.model import load_model
+from src.features import FEATURE_COLS
+from src.pipeline import load_cached_data
 
 
 def get_player_stats(df: pd.DataFrame, name: str) -> dict | None:

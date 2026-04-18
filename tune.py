@@ -16,15 +16,12 @@ from xgboost import XGBClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import roc_auc_score
 
-from config import logger
-
-
-import os
+from src.config import logger
 
 
 def load_data() -> Any:
     """Load cached data for tuning."""
-    cache_path = os.path.join(os.path.dirname(__file__), "..", "data_cache.pkl")
+    cache_path = "data_cache.pkl"
     with open(cache_path, "rb") as f:
         return pickle.load(f)
 

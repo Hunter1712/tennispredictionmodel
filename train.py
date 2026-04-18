@@ -4,8 +4,8 @@ Main entry point
 """
 
 import sys
-from pipeline import run_pipeline
-from config import config, logger
+from src.pipeline import run_pipeline
+from src.config import config, logger
 
 
 def main():
@@ -19,7 +19,7 @@ def main():
     else:
         logger.info("MODE: Production (train on all data)")
 
-    model, results = run_pipeline(test_mode=test_mode)
+    model, results = run_pipeline()
 
     if test_mode:
         print("\n" + "=" * 60)

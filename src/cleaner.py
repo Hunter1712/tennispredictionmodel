@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from config import logger
-from exceptions import DataCleanError
+from .config import logger
+from .exceptions import DataCleanError
 
 # Critical columns that must exist for a valid match
 CRITICAL_COLS: list[str] = [

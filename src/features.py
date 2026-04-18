@@ -11,8 +11,8 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
 
-from config import logger
-from exceptions import FeatureEngineeringError
+from .config import logger
+from .exceptions import FeatureEngineeringError
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
