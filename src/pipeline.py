@@ -1,12 +1,14 @@
 """
-Pipeline orchestration for Tennis Match Prediction Model
+Pipeline orchestration for Tennis Match Prediction Model.
 """
+
+from __future__ import annotations
 
 import os
 import pickle
+from typing import TYPE_CHECKING
 
-from typing import Optional
-
+import pandas as pd
 from xgboost import XGBClassifier
 
 from config import config, logger
@@ -27,19 +29,28 @@ from model import (
     predict_match,
 )
 
-CACHE_PATH = "../data_cache.pkl"
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
+import os
+
+CACHE_PATH = os.path.join(os.path.dirname(__file__), "..", "data_cache.pkl")
 
 
 class TennisPredictionPipeline:
     """Complete pipeline for tennis match prediction."""
 
-    def __init__(self):
-        self.model: Optional[XGBClassifier] = None
-        self.results: Optional[dict] = None
-        self.feature_cols = FEATURE_COLS
+    def __init__(self) -> None:
+        self.model: XGBClassifier | None = None
+        self.results: dict[str, float | pd.DataFrame] | None = None
+        self.feature_cols: list[str] = FEATURE_COLS
 
-    def run(self) -> tuple[XGBClassifier, dict]:
-        """Execute full training pipeline."""
+    def run(self) -> tuple[XGBClassifier, dict[str, float | pd.DataFrame]]:
+        """Execute full training pipeline.
+
+        Returns:
+            Tuple of (trained_model, evaluation_results).
+        """
         logger.info("=" * 60)
         logger.info("TENNIS MATCH WINNER PREDICTION MODEL")
         logger.info("=" * 60)
@@ -93,28 +104,28 @@ class TennisPredictionPipeline:
         self.model = load_model()
         return self.model
 
-    def predict(self, match_features: dict) -> tuple[int, float]:
-        """Make a prediction for a match."""
+    def predict(self, match_features: dict[str, float]) -> tuple[int, float]:
+        """Make a prediction for a match.
+
+        Args:
+            match_features: Dictionary of feature values.
+
+        Returns:
+            Tuple of (prediction, probability).
+        """
         if self.model is None:
             self.load_existing()
         return predict_match(self.model, match_features, self.feature_cols)
 
 
-def run_pipeline() -> tuple[XGBClassifier, dict]:
+def run_pipeline() -> tuple[XGBClassifier, dict[str, float | pd.DataFrame]]:
     """Convenience function to run the pipeline."""
     pipeline = TennisPredictionPipeline()
     return pipeline.run()
 
 
-def load_existing_model() -> XGBClassifier:
-    """Convenience function to load existing model."""
-    return load_model()
-
-
-def load_cached_data() -> pd.DataFrame:
-    """Load cached processed data (for export_predictions.py)."""
-    import pandas as pd
-
+def load_cached_data() -> pd.DataFrame | None:
+    """Load cached processed data for export_predictions.py."""
     if os.path.exists(CACHE_PATH):
         with open(CACHE_PATH, "rb") as f:
             return pickle.load(f)

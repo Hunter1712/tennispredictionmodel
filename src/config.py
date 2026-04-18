@@ -11,8 +11,8 @@ from dataclasses import dataclass
 class Config:
     """Main configuration for the tennis prediction model"""
 
-    DATA_FOLDER: str = "../data"
-    MODEL_PATH: str = "../models/tennis_model.pkl"
+    DATA_FOLDER: str = "data"
+    MODEL_PATH: str = "models/tennis_model.pkl"
 
     TRAIN_START_YEAR: int = 1991
     TRAIN_END_YEAR: int = 2024
@@ -25,22 +25,21 @@ class Config:
     MODEL_PARAMS: dict = None
 
     def __post_init__(self):
-        self.MODEL_PARAMS = {
-            "n_estimators": 500,
-            "max_depth": 7,
-            "learning_rate": 0.05,
+        self.MODEL_PARAMS = {            "n_estimators": 272,
+            "max_depth": 9,
+            "learning_rate": 0.05420686096244507,
             "min_child_weight": 5,
-            "colsample_bytree": 0.8,
-            "subsample": 0.8,
-            "reg_alpha": 0.1,
-            "reg_lambda": 0.1,
+            "colsample_bytree": 0.9152072097559515,
+            "subsample": 0.8338997111968103,
+            "reg_alpha": 0.006693252268057703,
+            "reg_lambda": 0.08081397412257926,
+            "gamma": 4.587871066453646,
             "objective": "binary:logistic",
             "eval_metric": "logloss",
             "random_state": 42,
             "n_jobs": -1,
             "verbosity": 0,
             "tree_method": "hist",
-        }
 
 
 config = Config()

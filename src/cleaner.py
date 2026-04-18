@@ -1,15 +1,16 @@
 """
-Data cleaning module for Tennis Match Prediction Model
+Data cleaning module for Tennis Match Prediction Model.
 """
+
+from __future__ import annotations
 
 import pandas as pd
 
 from config import logger
 from exceptions import DataCleanError
 
-
 # Critical columns that must exist for a valid match
-CRITICAL_COLS = [
+CRITICAL_COLS: list[str] = [
     "winner_rank",
     "loser_rank",
     "winner_age",
@@ -20,7 +21,7 @@ CRITICAL_COLS = [
 ]
 
 # Match statistics columns (missing indicates incomplete match)
-STAT_COLS = [
+STAT_COLS: list[str] = [
     "w_ace",
     "w_svpt",
     "w_1stIn",
@@ -35,20 +36,16 @@ STAT_COLS = [
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Clean data:
-    - Remove matches with incomplete outcomes
-    - Remove matches with missing critical stats
-    - Handle data type conversions
+    """Clean data by removing invalid rows and converting types.
 
     Args:
-        df: Raw DataFrame from loader
+        df: Raw DataFrame from loader.
 
     Returns:
-        pd.DataFrame: Cleaned DataFrame
+        Cleaned DataFrame.
 
     Raises:
-        DataCleanError: If cleaning fails critically
+        DataCleanError: If cleaning fails critically.
     """
     logger.info("Cleaning data")
 

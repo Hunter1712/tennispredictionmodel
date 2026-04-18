@@ -1,8 +1,11 @@
 """
-Model training, evaluation and prediction module for Tennis Match Prediction Model
+Model training, evaluation and prediction module for Tennis Match Prediction Model.
 """
 
+from __future__ import annotations
+
 import os
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -28,8 +31,13 @@ from exceptions import (
     InvalidFeatureError,
 )
 
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
-def chronological_split(df_features: pd.DataFrame, feature_cols: list[str]) -> tuple:
+
+def chronological_split(
+    df_features: pd.DataFrame, feature_cols: list[str]
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     """Split data chronologically: Train up to TEST_START_YEAR-1, Test from TEST_START_YEAR."""
     logger.info("Splitting data chronologically")
 
@@ -73,7 +81,7 @@ def evaluate_model(
     y_train: pd.Series,
     y_test: pd.Series,
     feature_cols: list[str],
-) -> dict:
+) -> dict[str, float | pd.DataFrame]:
     """Comprehensive model evaluation."""
     logger.info("Evaluating model")
 
@@ -144,7 +152,7 @@ def evaluate_model(
         raise ModelEvaluationError(f"Failed to evaluate model: {e}") from e
 
 
-def save_model(model: XGBClassifier, path: str = None) -> None:
+def save_model(model: XGBClassifier, path: str | None = None) -> None:
     """Save trained model to disk using joblib."""
     path = path or config.MODEL_PATH
     logger.info(f"Saving model to {path}")
@@ -156,7 +164,7 @@ def save_model(model: XGBClassifier, path: str = None) -> None:
         raise ModelSaveError(f"Failed to save model to {path}: {e}") from e
 
 
-def load_model(path: str = None) -> XGBClassifier:
+def load_model(path: str | None = None) -> XGBClassifier:
     """Load trained model from disk using joblib."""
     path = path or config.MODEL_PATH
     logger.info(f"Loading model from {path}")
@@ -173,7 +181,9 @@ def load_model(path: str = None) -> XGBClassifier:
 
 
 def predict_match(
-    model: XGBClassifier, match_features: dict, feature_cols: list[str]
+    model: XGBClassifier,
+    match_features: dict[str, float],
+    feature_cols: list[str],
 ) -> tuple[int, float]:
     """Predict winner for a new match."""
     try:

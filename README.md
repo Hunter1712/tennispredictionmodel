@@ -1,72 +1,88 @@
-# Tennis Match Predictor (Backend)
+# 🎾 Tennis Match Predictor
 
-XGBoost model predicting ATP tennis match winners.
+ML-powered prediction of ATP tennis match winners using XGBoost.
 
-**This is the private backend repository.** The web UI is in a separate public repo.
+## Features
+
+- **4-feature model**: Elo ratings + fatigue metrics
+- **Chronological split**: Train on 1991-2024, test on 2025-2026
+- **Auto-tuning**: Optuna hyperparameter optimization
+- **Live predictions**: Exported to JavaScript for web deployment
 
 ## Quick Start
 
 ```bash
-# Train model (generates cache)
-python src/main.py
+# Install dependencies
+uv sync
 
-# Export predictions to output/predictions.js
-python src/export_predictions.py
+# Train model
+uv run python src/main.py
+
+# Tune hyperparameters (optional)
+uv run python src/tune.py
+
+# Export predictions for web
+uv run python src/export_predictions.py
 ```
 
 ## Project Structure
 
 ```
-├── src/                    # Python source code
-│   ├── main.py            # Entry point - trains model
+├── src/
+│   ├── main.py              # Entry point - trains model
+│   ├── tune.py              # Hyperparameter tuning with Optuna
 │   ├── export_predictions.py # Generate predictions.js
-│   ├── pipeline.py        # Training pipeline
-│   ├── features.py       # Feature engineering
-│   ├── cleaner.py         # Data cleaning
-│   ├── loader.py          # CSV data loading
-│   ├── model.py           # Model training/evaluation
-│   └── config.py          # Configuration
-├── data/                   # Raw CSV match data (1991-2026) - NOT committed
-├── models/                 # Trained model (.pkl) - NOT committed
-├── output/                 # predictions.js output - NOT committed
-├── .github/workflows/     # GitHub Actions for auto-sync
-└── pyproject.toml         # Dependencies
+│   ├── pipeline.py          # Training pipeline
+│   ├── features.py          # Feature engineering (Elo + fatigue)
+│   ├── cleaner.py           # Data cleaning
+│   ├── loader.py            # CSV data loading
+│   ├── model.py             # Model training/evaluation
+│   └── config.py            # Configuration & hyperparameters
+├── data/                    # Raw CSV match data (1991-2026)
+├── models/                  # Trained model (.pkl)
+├── output/                  # predictions.js for web UI
+├── pyproject.toml           # Dependencies
+└── README.md
 ```
 
 ## How It Works
 
-1. **Data**: Loads CSV files from `data/` folder
-2. **Cleaning**: Removes incomplete matches, handles missing values
-3. **Features**: Builds player stats (win rate, recent form, surface skill)
-4. **Training**: XGBoost classifier trained on 1991-2024, tested on 2025-2026
-5. **Export**: Generates `output/predictions.js` for web UI
-
-## Syncing to Public Repo
-
-### Option 1: Manual Copy
-1. Run `python src/export_predictions.py`
-2. Copy `output/predictions.js` to your public repo
-
-### Option 2: GitHub Actions (see `.github/workflows/sync.yml`)
-1. Go to **Actions** tab on GitHub
-2. Run **Sync Predictions** workflow
-3. Enter your public repo name and commit message
+1. **Load**: ATP match data from CSV files (1991-2026)
+2. **Clean**: Remove incomplete matches, handle missing values
+3. **Features**: Build player stats (Elo ratings, rest quality, days since last match)
+4. **Train**: XGBoost classifier with tuned hyperparameters
+5. **Predict**: Generate matchup predictions for web UI
 
 ## Model Performance
 
-- **Test Accuracy**: ~75%
-- **ROC-AUC**: ~0.85
-- **CV Accuracy**: ~81%
+| Metric | Value |
+|--------|-------|
+| Test Accuracy | **73.55%** |
+| Test ROC-AUC | **0.8228** |
+| CV ROC-AUC | **0.8831** |
+
+### Features Used
+
+| Feature | Importance |
+|---------|------------|
+| `days_since_last_diff` | 57.2% |
+| `rest_quality_diff` | 25.1% |
+| `elo_diff` | 10.3% |
+| `elo_surface_diff` | 7.4% |
 
 ## Requirements
 
 - Python 3.14+
-- xgboost, pandas, scikit-learn, numpy
+- [uv](https://github.com/astral-sh/uv) for dependency management
 
-Install: `uv sync` or `pip install -r requirements.txt`
+Install: `uv sync`
+
+## License
+
+MIT License
 
 ## Notes
 
-- **Data files** (`data/*.csv`) are NOT committed (too large, keep local)
-- **Trained model** (`models/*.pkl`) is NOT committed
-- **Predictions** (`output/predictions.js`) - sync manually or via GitHub Actions to public repo
+- **Data files** (`data/*.csv`) are not committed (too large)
+- **Trained model** (`models/*.pkl`) is not committed
+- **Predictions** (`output/predictions.js`) - generated for web deployment

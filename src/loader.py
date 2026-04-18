@@ -1,5 +1,5 @@
 """
-Data loading module for Tennis Match Prediction Model
+Data loading module for Tennis Match Prediction Model.
 """
 
 import os
@@ -12,14 +12,13 @@ from exceptions import DataLoadError
 
 
 def load_all_csv() -> pd.DataFrame:
-    """
-    Load all ATP CSV files from data folder and combine into single DataFrame
+    """Load all ATP CSV files from data folder and combine into single DataFrame.
 
     Returns:
-        pd.DataFrame: Combined dataframe with all matches
+        Combined DataFrame with all matches.
 
     Raises:
-        DataLoadError: If no CSV files found or all fail to load
+        DataLoadError: If no CSV files found or all fail to load.
     """
     logger.info("Loading ATP data from CSV files")
 
@@ -66,36 +65,3 @@ def load_all_csv() -> pd.DataFrame:
         return combined_df
     except Exception as e:
         raise DataLoadError(f"Failed to combine dataframes: {e}") from e
-
-
-def load_csv_for_year(year: int) -> pd.DataFrame | None:
-    """
-    Load CSV file for a specific year
-
-    Args:
-        year: Year to load (e.g., 2024)
-
-    Returns:
-        pd.DataFrame: DataFrame for that year, or None if not found
-    """
-    csv_path = os.path.join(config.DATA_FOLDER, f"{year}.csv")
-    if os.path.exists(csv_path):
-        return pd.read_csv(csv_path, low_memory=False)
-    return None
-
-
-def get_available_years() -> list[int]:
-    """Get list of available years in data folder"""
-    csv_files = glob(os.path.join(config.DATA_FOLDER, "*.csv"))
-    years = set()
-    for f in csv_files:
-        filename = os.path.basename(f)
-        try:
-            # Only include numeric year files (not challenger, amateur, etc.)
-            if filename.replace(".csv", "").isdigit():
-                year = int(filename.replace(".csv", ""))
-                if 1960 <= year <= 2030:
-                    years.add(year)
-        except ValueError, IndexError:
-            continue
-    return sorted(years)
