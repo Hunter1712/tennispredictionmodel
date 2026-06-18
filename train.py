@@ -8,7 +8,22 @@ from src.pipeline import run_pipeline
 from src.config import config, logger
 
 
-def main():
+def main() -> None:
+    """Train tennis match prediction model.
+    
+    Runs the complete ML pipeline:
+    1. Load match data from data/ folder
+    2. Clean and engineer features
+    3. Split data chronologically (train on past, test on recent)
+    4. Train LightGBM model
+    5. Evaluate and save model
+    
+    Test mode (--test flag):
+        Trains on 1991-2024, tests on 2025-2026 for validation.
+    
+    Production mode (default):
+        Trains on entire dataset for deployment.
+    """
     # Parse command line args
     test_mode = "--test" in sys.argv
 

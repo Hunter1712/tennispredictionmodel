@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pandas as pd
 
-from .config import logger
+from .config import config, logger
 from .exceptions import FeatureEngineeringError
 
 if TYPE_CHECKING:
@@ -40,19 +40,8 @@ def _compute_rest_quality(days: pd.Series) -> NDArray[np.float64]:
     return result
 
 
-# All features for model (10 diff features - low overfit risk)
-FEATURE_COLS: list[str] = [
-    "elo_diff",
-    "elo_surface_diff",
-    "rank_points_diff",
-    "rank_diff",
-    "age_diff",
-    "seed_diff",
-    "height_diff",
-    "days_since_last_diff",
-    "rest_quality_diff",
-    "win_rate_diff",
-]
+# Import feature columns from centralized config
+FEATURE_COLS = config.FEATURE_COLS
 
 
 def build_player_stats(df: pd.DataFrame) -> pd.DataFrame:
@@ -168,8 +157,10 @@ def build_player_stats(df: pd.DataFrame) -> pd.DataFrame:
         total = ps["wins"] + ps["losses"]
         ps["win_rate"] = ps["wins"] / max(total, 1)
 
-    df["winner_win_rate"] = df["winner_id"].map(lambda x: player_stats[x]["win_rate"])
-    df["loser_win_rate"] = df["loser_id"].map(lambda x: player_stats[x]["win_rate"])
+    # Vectorized win rate mapping (more efficient than lambda)
+    win_rate_series = pd.Series({k: v["win_rate"] for k, v in player_stats.items()})
+    df["winner_win_rate"] = df["winner_id"].map(win_rate_series).fillna(0.5)
+    df["loser_win_rate"] = df["loser_id"].map(win_rate_series).fillna(0.5)
 
     logger.info(f"Features built for {len(df)} matches")
     return df

@@ -75,7 +75,7 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series) -> LGBMClassifier:
 
 
 def evaluate_model(
-    model: XGBClassifier,
+    model: LGBMClassifier,
     X_train: pd.DataFrame,
     X_test: pd.DataFrame,
     y_train: pd.Series,
@@ -103,41 +103,44 @@ def evaluate_model(
         test_f1 = f1_score(y_test, y_test_pred, zero_division=0)
         test_roc = roc_auc_score(y_test, y_test_proba)
 
-        print(f"\nTRAINING SET PERFORMANCE:")
-        print(f"  Accuracy:  {train_acc:.4f}")
-        print(f"  Precision: {train_prec:.4f}")
-        print(f"  Recall:    {train_rec:.4f}")
-        print(f"  F1-Score:  {train_f1:.4f}")
+        # Log training performance
+        logger.info("TRAINING SET PERFORMANCE:")
+        logger.info(f"  Accuracy:  {train_acc:.4f}")
+        logger.info(f"  Precision: {train_prec:.4f}")
+        logger.info(f"  Recall:    {train_rec:.4f}")
+        logger.info(f"  F1-Score:  {train_f1:.4f}")
 
-        print(
-            f"\nTEST SET PERFORMANCE ({config.TEST_START_YEAR}-{config.TEST_END_YEAR}):"
-        )
-        print(f"  Accuracy:  {test_acc:.4f}")
-        print(f"  Precision: {test_prec:.4f}")
-        print(f"  Recall:    {test_rec:.4f}")
-        print(f"  F1-Score:  {test_f1:.4f}")
-        print(f"  ROC-AUC:   {test_roc:.4f}")
+        # Log test performance
+        logger.info(f"\nTEST SET PERFORMANCE ({config.TEST_START_YEAR}-{config.TEST_END_YEAR}):")
+        logger.info(f"  Accuracy:  {test_acc:.4f}")
+        logger.info(f"  Precision: {test_prec:.4f}")
+        logger.info(f"  Recall:    {test_rec:.4f}")
+        logger.info(f"  F1-Score:  {test_f1:.4f}")
+        logger.info(f"  ROC-AUC:   {test_roc:.4f}")
 
+        # Log confusion matrix
         cm = confusion_matrix(y_test, y_test_pred)
-        print(f"\nCONFUSION MATRIX (Test Set):")
-        print(f"  TN: {cm[0, 0]}, FP: {cm[0, 1]}, FN: {cm[1, 0]}, TP: {cm[1, 1]}")
+        logger.info("CONFUSION MATRIX (Test Set):")
+        logger.info(f"  TN: {cm[0, 0]}, FP: {cm[0, 1]}, FN: {cm[1, 0]}, TP: {cm[1, 1]}")
 
-        print(f"\nCROSS-VALIDATION ({config.CV_FOLDS}-Fold Stratified):")
+        # Cross-validation evaluation
+        logger.info(f"\nCROSS-VALIDATION ({config.CV_FOLDS}-Fold Stratified):")
         skf = StratifiedKFold(
             n_splits=config.CV_FOLDS, shuffle=True, random_state=config.CV_RANDOM_STATE
         )
         cv_acc = cross_val_score(model, X_train, y_train, cv=skf, scoring="accuracy")
         cv_auc = cross_val_score(model, X_train, y_train, cv=skf, scoring="roc_auc")
-        print(f"  CV Accuracy: {cv_acc.mean():.4f} (+/- {cv_acc.std():.4f})")
-        print(f"  CV ROC-AUC:  {cv_auc.mean():.4f} (+/- {cv_auc.std():.4f})")
+        logger.info(f"  CV Accuracy: {cv_acc.mean():.4f} (+/- {cv_acc.std():.4f})")
+        logger.info(f"  CV ROC-AUC:  {cv_auc.mean():.4f} (+/- {cv_auc.std():.4f})")
 
+        # Feature importance
         importance = pd.DataFrame(
             {"feature": feature_cols, "importance": model.feature_importances_}
         )
         importance = importance.sort_values("importance", ascending=False)
-        print(f"\nTOP 10 FEATURES:")
+        logger.info("TOP 10 FEATURES:")
         for _, row in importance.head(10).iterrows():
-            print(f"  {row['feature']:25s}: {row['importance']:.4f}")
+            logger.info(f"  {row['feature']:25s}: {row['importance']:.4f}")
 
         return {
             "test_accuracy": test_acc,
