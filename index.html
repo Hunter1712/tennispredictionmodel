@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tennis Elo Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="predictions.js"></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="load-text">Loading ratings…</div>
+</div>
+
+<nav>
+  <div class="nav-tab active" data-page="predict">Predict</div>
+  <div class="nav-tab" data-page="rankings">Rankings</div>
+</nav>
+
+<!-- ══ PREDICT ══════════════════════════════════════════════════════════ -->
+<div class="page active" id="page-predict">
+  <div style="margin-bottom:1.6rem;padding-top:.4rem">
+    <div class="eyebrow">ATP Tour · Elo Model · 1991–2026</div>
+    <h1>Match <span>Predictor</span></h1>
+    <div class="subtitle" id="subtitle-params">loading…</div>
+  </div>
+
+  <div class="matchup">
+    <div class="card">
+      <div class="card-label">Player A</div>
+      <select id="playerA" onchange="updateConfidence()"></select>
+    </div>
+    <div class="vs-col"><span>VS</span></div>
+    <div class="card">
+      <div class="card-label">Player B</div>
+      <select id="playerB" onchange="updateConfidence()"></select>
+    </div>
+  </div>
+
+  <div class="rel-strip" id="relStrip" style="display:none">
+    <div class="rel-card" id="relCardA">
+      <div class="rel-player" id="relNameA">—</div>
+      <div class="rel-tier"   id="relTierA">—</div>
+      <div class="rel-meta"   id="relMetaA">—</div>
+    </div>
+    <div class="rel-card" id="relCardB">
+      <div class="rel-player" id="relNameB">—</div>
+      <div class="rel-tier"   id="relTierB">—</div>
+      <div class="rel-meta"   id="relMetaB">—</div>
+    </div>
+  </div>
+
+  <div class="card-label" style="margin-bottom:.5rem">Surface</div>
+  <div class="surf-btns">
+    <button class="surf-btn active" data-surface="Hard">Hard</button>
+    <button class="surf-btn" data-surface="Clay">Clay</button>
+    <button class="surf-btn" data-surface="Grass">Grass</button>
+    <button class="surf-btn" data-surface="Carpet">Carpet</button>
+  </div>
+
+  <div class="error-msg" id="errMsg">⚠ Select two different players.</div>
+  <button class="predict-btn" onclick="predict()">Predict Match</button>
+
+  <div class="result card" id="result">
+    <div class="card-label">Match Prediction</div>
+    <div class="win-prob">
+      <div class="player-prob" id="probA"><div class="pname" id="nameA">—</div><div class="pct" id="pctA">—%</div></div>
+      <div class="player-prob" id="probB"><div class="pname" id="nameB">—</div><div class="pct" id="pctB">—%</div></div>
+    </div>
+    <div class="bar-track-h"><div class="bar-fill-h" id="barFill" style="width:50%"></div></div>
+    <div class="elo-detail">
+      <div class="lbl" id="d_nA"></div><div class="lbl center">Overall Elo</div><div class="lbl right" id="d_nB"></div>
+      <div class="val" id="d_eA"></div><div></div><div class="val right" id="d_eB"></div>
+      <div class="lbl"></div><div class="lbl center" id="d_sLbl">Surface Elo</div><div class="lbl right"></div>
+      <div class="val" id="d_sA"></div><div></div><div class="val right" id="d_sB"></div>
+    </div>
+    <div class="verdict" id="verdict"></div>
+  </div>
+</div>
+
+<!-- ══ RANKINGS ══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-rankings">
+  <div style="margin-bottom:1.5rem;padding-top:.4rem">
+    <div class="eyebrow">All-time Ratings</div>
+    <h1>Player <span>Rankings</span></h1>
+    <div class="subtitle">Rank Points · click columns to sort · best surface highlighted</div>
+  </div>
+  <div class="rank-controls">
+    <input class="search-input" type="text" id="searchInput" placeholder="Search player…" oninput="renderRankings()">
+    <div class="min-matches-wrap">
+      Min matches:
+      <select id="minMatches" onchange="renderRankings()">
+        <option value="0">All</option>
+        <option value="10">10+</option>
+        <option value="50" selected>50+</option>
+        <option value="100">100+</option>
+        <option value="200">200+</option>
+        <option value="500">500+</option>
+      </select>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table id="rankTable">
+      <thead><tr>
+        <th onclick="sortRank('rank')"    id="th_rank" class="sorted">#</th>
+        <th onclick="sortRank('name')"    id="th_name">Player</th>
+        <th onclick="sortRank('overall')" id="th_overall">Overall</th>
+        <th onclick="sortRank('Hard')"    id="th_Hard">Hard</th>
+        <th onclick="sortRank('Clay')"    id="th_Clay">Clay</th>
+        <th onclick="sortRank('Grass')"   id="th_Grass">Grass</th>
+        <th onclick="sortRank('Carpet')"  id="th_Carpet">Carpet</th>
+        <th onclick="sortRank('matches')" id="th_matches">Matches</th>
+      </tr></thead>
+      <tbody id="rank-body"></tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>
